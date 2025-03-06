@@ -1,19 +1,21 @@
 using Godot;
 
-public class Constants
+namespace bravestory.scripts;
+
+public abstract class Constants
 {
     //重力
-    public static double GRAVITY = ProjectSettings.GetSetting("physics/2d/default_gravity").AsDouble();
+    public static readonly double Gravity = ProjectSettings.GetSetting("physics/2d/default_gravity").AsDouble();
 
     //水平移动速度
-    public static int RUN_SPEED = 150;
-    
+    public const int RunSpeed = 150;
+
     //跳跃速度
-    public static int JUMP_VELOCITY = -320;
-    
+    public const int JumpVelocity = -320;
+
     //角色地面加速度
-    public static float FLOOR_ACCELERATION = RUN_SPEED / 0.2f;
-    
+    public const float FloorAcceleration = RunSpeed / 0.2f;
+
     //角色空中加速度
-    public static float AIR_ACCELERATION = RUN_SPEED / 0.02f;
+    public const float AirAcceleration = RunSpeed / 0.02f;
 }
