@@ -13,7 +13,10 @@ public enum State
     Fall,
     Landing,
     WallSliding,
-    WallJump
+    WallJump,
+    Attack1,
+    Attack2,
+    Attack3
 }
 
 public partial class Player : CharacterBody2D
@@ -27,8 +30,18 @@ public partial class Player : CharacterBody2D
     private RayCast2D _footChecker;
     
     private bool _isFirstTick; //是否是状态改变的第一帧
+    private bool _isComboRequested = false; //是否发生combo
     
     private static readonly List<State> GroundStates = new();
+
+    private bool _canCombo;
+
+    [Export]
+    public bool CanCombo
+    {
+        get => _canCombo;
+        set => _canCombo = value;
+    }
 
     public override void _Ready()
     {
@@ -42,9 +55,8 @@ public partial class Player : CharacterBody2D
         _stateMachine = new StateMachine();
         AddChild(_stateMachine);
 
-        GroundStates.Add(State.Idle);
-        GroundStates.Add(State.Running);
-        GroundStates.Add(State.Landing);
+        State[] states = [State.Idle, State.Running, State.Landing, State.Attack1, State.Attack2, State.Attack3];
+        GroundStates.AddRange(states);
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -64,6 +76,11 @@ public partial class Player : CharacterBody2D
                 vec.Y = JumpVelocity / 2;
                 Velocity = vec;
             }
+        }
+
+        if (@event.IsActionPressed("attack") && _canCombo)
+        {
+            _isComboRequested = true;
         }
     }
 
@@ -99,6 +116,11 @@ public partial class Player : CharacterBody2D
                 else
                     Move(Gravity, delta);
                 _graphics.SetScale(new Vector2(GetWallNormal().X, _graphics.Scale.Y));
+                break;
+            case State.Attack1:
+            case State.Attack2:
+            case State.Attack3:
+                Stand(Gravity, delta);
                 break;
         }
 
@@ -138,6 +160,13 @@ public partial class Player : CharacterBody2D
         var shouldJump = canJump && _jumpRequestTimer.TimeLeft > 0;
         if (shouldJump)
             return State.Jump;
+
+        //当前状态是地面状态，但是玩家不在地板上
+        if (GroundStates.Contains(state) && !IsOnFloor())
+        {
+            //发生坠落
+            return State.Fall;
+        }
         
         var direction = Input.GetAxis("move_left", "move_right");
         //是否站立不动
@@ -146,8 +175,8 @@ public partial class Player : CharacterBody2D
         switch (state)
         {
             case State.Idle:
-                if (!IsOnFloor())
-                    return State.Fall;
+                if (Input.IsActionJustPressed("attack"))
+                    return State.Attack1;
                 if (!isStill)
                     return State.Running;
                 break;
@@ -161,8 +190,8 @@ public partial class Player : CharacterBody2D
                     return State.WallSliding;
                 break;
             case State.Running:
-                if (!IsOnFloor())
-                    return State.Fall;
+                if (Input.IsActionJustPressed("attack"))
+                    return State.Attack1;
                 if (isStill)
                     return State.Idle;
                 break;
@@ -191,6 +220,24 @@ public partial class Player : CharacterBody2D
                     return State.WallSliding;
                 if (Velocity.Y >= 0)
                     return State.Fall;
+                break;
+            case State.Attack1:
+                if (!_animationPlayer.IsPlaying())
+                    if (_isComboRequested)
+                        return State.Attack2;
+                    else
+                        return State.Idle;
+                break;
+            case State.Attack2:
+                if (!_animationPlayer.IsPlaying())
+                    if (_isComboRequested)
+                        return State.Attack3;
+                    else
+                        return State.Idle;
+                break;
+            case State.Attack3:
+                if (!_animationPlayer.IsPlaying())
+                    return State.Idle;
                 break;
             default:
                 return state;
@@ -243,6 +290,18 @@ public partial class Player : CharacterBody2D
                 break;
             case State.WallSliding:
                 _animationPlayer.Play("wall_sliding");
+                break;
+            case State.Attack1:
+                _animationPlayer.Play("attack_1");
+                _isComboRequested = false;
+                break;
+            case State.Attack2:
+                _animationPlayer.Play("attack_2");
+                _isComboRequested = false;
+                break;
+            case State.Attack3:
+                _animationPlayer.Play("attack_3");
+                _isComboRequested = false;
                 break;
         }
 

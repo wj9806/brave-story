@@ -598,7 +598,7 @@ tile_set = SubResource("TileSet_tlwt5")
 
 [node name="Player" parent="." instance=ExtResource("2_fj7yv")]
 z_index = 150
-position = Vector2(369, -91)
+position = Vector2(228, 191)
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
 position = Vector2(1, -36)
@@ -769,4 +769,4 @@ one_shot = true
 
 [node name="Boar" parent="." instance=ExtResource("7_pkg7o")]
 z_index = 150
-position = Vector2(179, -142)
+position = Vector2(79, 196)

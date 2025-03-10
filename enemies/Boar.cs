@@ -43,7 +43,7 @@ public partial class Boar : Enemy
                 if (_wallChecker.IsColliding() || !_floorChecker.IsColliding())
                     Direction = (Direction)(-(int)Direction);
                 Move(MaxSpeed, delta);
-                if (_playerChecker.IsColliding())
+                if (CanSeePlayer())
                     _calmDownTimer.Start();
                 break;
         }
@@ -51,7 +51,7 @@ public partial class Boar : Enemy
 
     private State GetNextState(State state)
     {
-        if (_playerChecker.IsColliding())
+        if (CanSeePlayer())
         {
             return State.Run;
         }
@@ -97,12 +97,20 @@ public partial class Boar : Enemy
                     //悬崖转身后强制更新Raycast
                     _floorChecker.ForceRaycastUpdate();
                 }
-
-                
                 break;
             case State.Run:
                 AnimationPlayer.Play("run");
                 break;
         }
+    }
+
+    private bool CanSeePlayer()
+    {
+        if (!_playerChecker.IsColliding())
+        {
+            return false;
+        }
+        //判断射线跟哪个物体发生碰撞
+        return _playerChecker.GetCollider() is Player;
     }
 }
