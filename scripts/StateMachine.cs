@@ -7,21 +7,23 @@ public partial class StateMachine : Node
 
 	private int _currentState = -1;
 
+	public double StateTime { get; private set; }
+
 	public int CurrentState
 	{
 		get => _currentState;
 		set
 		{
 			//调用父节点的TransitionState函数
-			_currentState = value;
 			GetParent().Call("TransitionState", _currentState, value);
+			_currentState = value;
+			StateTime = 0;
 		}
 	}
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		
 		// 启动异步任务
 		InitializeStateAsync();
 	}
@@ -46,5 +48,7 @@ public partial class StateMachine : Node
 		}
 		
 		GetParent().Call("TickPhysics", _currentState, delta);
+		StateTime += delta;
 	}
+	
 }

@@ -8,7 +8,7 @@ public abstract class Constants
     public static readonly double Gravity = ProjectSettings.GetSetting("physics/2d/default_gravity").AsDouble();
 
     //水平移动速度
-    public const int RunSpeed = 150;
+    public const int RunSpeed = 160;
 
     //跳跃速度
     public const int JumpVelocity = -320;
@@ -17,5 +17,8 @@ public abstract class Constants
     public const float FloorAcceleration = RunSpeed / 0.2f;
 
     //角色空中加速度
-    public const float AirAcceleration = RunSpeed / 0.02f;
+    public const float AirAcceleration = RunSpeed / 0.05f;
+    
+    //蹬墙跳速度
+    public static Vector2 WallJumpVelocity = new(500, -300);
 }

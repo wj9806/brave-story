@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 using static bravestory.scripts.Constants;
@@ -10,26 +11,33 @@ public enum State
     Running,
     Jump,
     Fall,
-    Landing
+    Landing,
+    WallSliding,
+    WallJump
 }
 
 public partial class Player : CharacterBody2D
 {
-    private Sprite2D _sprite2D;
+    private Node2D _graphics;
     private AnimationPlayer _animationPlayer;
     private Timer _coyoteTimer;
     private Timer _jumpRequestTimer;
     private StateMachine _stateMachine;
+    private RayCast2D _handChecker;
+    private RayCast2D _footChecker;
+    
     private bool _isFirstTick; //是否是状态改变的第一帧
     
     private static readonly List<State> GroundStates = new();
 
     public override void _Ready()
     {
-        _sprite2D = GetNode<Sprite2D>("Sprite2D");
+        _graphics = GetNode<Node2D>("Graphics");
         _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
         _coyoteTimer = GetParent().GetNode<Timer>("CoyoteTimer");
         _jumpRequestTimer = GetParent().GetNode<Timer>("JumpRequestTimer");
+        _handChecker = _graphics.GetNode<RayCast2D>("HandChecker");
+        _footChecker = _graphics.GetNode<RayCast2D>("FootChecker");
 
         _stateMachine = new StateMachine();
         AddChild(_stateMachine);
@@ -68,11 +76,29 @@ public partial class Player : CharacterBody2D
             case State.Idle:
                 Move(Gravity, delta);
                 break;
+            case State.WallJump:
+                if (_stateMachine.StateTime < 0.1)
+                {
+                    Stand(_isFirstTick ? 0 : Gravity, delta);
+                    _graphics.SetScale(new Vector2(GetWallNormal().X, _graphics.Scale.Y));
+                }
+                else
+                {
+                    Move(Gravity, delta);
+                }
+                break;
             case State.Jump:
                 Move(_isFirstTick ? 0 : Gravity, delta);
                 break;
             case State.Landing:
-                Stand(delta);
+                Stand(Gravity, delta);
+                break;
+            case State.WallSliding:
+                if (Velocity.Y > 0)
+                    Move(Gravity / 4, delta);
+                else
+                    Move(Gravity, delta);
+                _graphics.SetScale(new Vector2(GetWallNormal().X, _graphics.Scale.Y));
                 break;
         }
 
@@ -90,17 +116,17 @@ public partial class Player : CharacterBody2D
 
         if (!Mathf.IsZeroApprox(direction))
         {
-            _sprite2D.FlipH = direction < 0;
+            _graphics.SetScale(new Vector2(direction < 0 ? -1.0f : 1.0f, _graphics.Scale.Y));
         }
 
         MoveAndSlide();
     }
 
-    private void Stand(double delta)
+    private void Stand(double gravity, double delta)
     {
         float acc = IsOnFloor() ? FloorAcceleration : AirAcceleration;
         var vec = new Vector2(Mathf.MoveToward(Velocity.X, 0, 
-            (float)delta * acc), Velocity.Y + (float)(Gravity * delta));
+            (float)delta * acc), Velocity.Y + (float)(gravity * delta));
         Velocity = vec;
         MoveAndSlide();
     }
@@ -131,6 +157,8 @@ public partial class Player : CharacterBody2D
                         return State.Landing;
                     else
                         return State.Running;
+                if (CanWallSlide())
+                    return State.WallSliding;
                 break;
             case State.Running:
                 if (!IsOnFloor())
@@ -143,8 +171,26 @@ public partial class Player : CharacterBody2D
                     return State.Fall;
                 break;
             case State.Landing:
+                if(!isStill)
+                    return State.Running;
                 if (!_animationPlayer.IsPlaying())
                     return State.Idle;
+                break;
+            case State.WallSliding:
+                if (_jumpRequestTimer.TimeLeft > 0)
+                {
+                    return State.WallJump;
+                }
+                if (IsOnFloor())
+                    return State.Idle;
+                if (!IsOnWall())
+                    return State.Fall;
+                break;
+            case State.WallJump:
+                if (CanWallSlide())
+                    return State.WallSliding;
+                if (Velocity.Y >= 0)
+                    return State.Fall;
                 break;
             default:
                 return state;
@@ -158,12 +204,12 @@ public partial class Player : CharacterBody2D
      */
     private void TransitionState(State from, State to)
     {
+        //GD.Print($"{Engine.GetPhysicsFrames()} {from} => {to}");
+        
         if (!GroundStates.Contains(from) && GroundStates.Contains(to))
         {
             _coyoteTimer.Stop();
         }
-        var vec = Velocity;
-        
         switch (to)
         {
             case State.Idle:
@@ -179,19 +225,44 @@ public partial class Player : CharacterBody2D
             case State.Running:
                 _animationPlayer.Play("running");
                 break;
+            case State.WallJump:
+                _animationPlayer.Play("jump");
+                
+                Velocity = new Vector2(WallJumpVelocity.X * GetWallNormal().X, WallJumpVelocity.Y);
+                _jumpRequestTimer.Stop();
+                break;
             case State.Jump:
                 _animationPlayer.Play("jump");
                 
-                vec.Y = JumpVelocity;
-                Velocity = vec;
+                Velocity = new Vector2(Velocity.X, JumpVelocity);
                 _coyoteTimer.Stop();
                 _jumpRequestTimer.Stop();
                 break;
             case State.Landing:
                 _animationPlayer.Play("landing");
                 break;
+            case State.WallSliding:
+                _animationPlayer.Play("wall_sliding");
+                break;
+        }
+
+        if (to == State.WallJump)
+        {
+            Engine.TimeScale = 0.3d;
+        }
+
+        if (from == State.WallJump)
+        {
+            Engine.TimeScale = 1.0;
         }
 
         _isFirstTick = true;
+    }
+
+
+    private bool CanWallSlide()
+    {
+        return IsOnWall() && _handChecker.IsColliding()
+                          && _footChecker.IsColliding();
     }
 }
