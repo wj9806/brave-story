@@ -7,6 +7,7 @@ namespace bravestory.scripts;
 
 public enum State
 {
+    KeepCurrent = Constants.KeepCurrent,
     Idle,
     Running,
     Jump,
@@ -16,7 +17,9 @@ public enum State
     WallJump,
     Attack1,
     Attack2,
-    Attack3
+    Attack3,
+    Hurt,
+    Dying
 }
 
 public partial class Player : CharacterBody2D
@@ -26,8 +29,12 @@ public partial class Player : CharacterBody2D
     private Timer _coyoteTimer;
     private Timer _jumpRequestTimer;
     private StateMachine _stateMachine;
+    private HurtBox _hurtBox;
     private RayCast2D _handChecker;
     private RayCast2D _footChecker;
+    private Damage _pendingDamage; //待处理伤害
+    private Stats _stats;
+    private Timer _invincibleTimer; //受击后的无敌计时器
     
     private bool _isFirstTick; //是否是状态改变的第一帧
     private bool _isComboRequested = false; //是否发生combo
@@ -51,9 +58,13 @@ public partial class Player : CharacterBody2D
         _jumpRequestTimer = GetParent().GetNode<Timer>("JumpRequestTimer");
         _handChecker = _graphics.GetNode<RayCast2D>("HandChecker");
         _footChecker = _graphics.GetNode<RayCast2D>("FootChecker");
+        _stats = GetNode<Stats>("Stats");
+        _invincibleTimer = GetNode<Timer>("InvincibleTimer");
 
         _stateMachine = new StateMachine();
         AddChild(_stateMachine);
+
+        _hurtBox = _graphics.GetNode<HurtBox>("HurtBox");
 
         State[] states = [State.Idle, State.Running, State.Landing, State.Attack1, State.Attack2, State.Attack3];
         GroundStates.AddRange(states);
@@ -86,6 +97,25 @@ public partial class Player : CharacterBody2D
 
     private void TickPhysics(State state, double delta)
     {
+        if (_invincibleTimer.TimeLeft > 0)
+        {
+            //玩家无敌
+            Color c = new(_graphics.Modulate)
+            {
+                //值域 0-1
+                A = (float)(Math.Sin(Time.GetTicksMsec() / 20) * 0.5) + 0.5f
+            };
+            _graphics.SetModulate(c);
+        }
+        else
+        {
+            Color c = new(_graphics.Modulate)
+            {
+                A = 1
+            };
+            _graphics.SetModulate(c);
+        }
+
         switch (state)
         {
             case State.Fall:
@@ -120,6 +150,8 @@ public partial class Player : CharacterBody2D
             case State.Attack1:
             case State.Attack2:
             case State.Attack3:
+            case State.Hurt:
+            case State.Dying:
                 Stand(Gravity, delta);
                 break;
         }
@@ -155,6 +187,15 @@ public partial class Player : CharacterBody2D
 
     private State GetNextState(State state)
     {
+        if (_stats.Health == 0)
+            if (state == State.Dying)
+                return State.KeepCurrent;
+            else
+                return State.Dying;
+
+        if (_pendingDamage != null)
+            return State.Hurt;
+        
         //是否能跳跃：在地板上或者timer剩余时间大于0
         var canJump = IsOnFloor() || _coyoteTimer.TimeLeft > 0;
         var shouldJump = canJump && _jumpRequestTimer.TimeLeft > 0;
@@ -239,11 +280,13 @@ public partial class Player : CharacterBody2D
                 if (!_animationPlayer.IsPlaying())
                     return State.Idle;
                 break;
-            default:
-                return state;
+            case State.Hurt:
+                if (!_animationPlayer.IsPlaying())
+                    return State.Idle;
+                break;
         }
 
-        return state;
+        return State.KeepCurrent;
     }
 
     /**
@@ -303,6 +346,22 @@ public partial class Player : CharacterBody2D
                 _animationPlayer.Play("attack_3");
                 _isComboRequested = false;
                 break;
+            case State.Hurt:
+                _animationPlayer.Play("hurt");
+                //扣血
+                _stats.Health -= _pendingDamage.Amount;
+                //计算相对方向
+                var dir = _pendingDamage.Source.GlobalPosition.DirectionTo(GlobalPosition);
+                //击退
+                Velocity = dir * KnockBackAmount;
+                //重置伤害
+                _pendingDamage = null;
+                _invincibleTimer.Start();
+                break;
+            case State.Dying:
+                _animationPlayer.Play("die");
+                _invincibleTimer.Stop();
+                break;
         }
 
         if (to == State.WallJump)
@@ -318,10 +377,28 @@ public partial class Player : CharacterBody2D
         _isFirstTick = true;
     }
 
-
     private bool CanWallSlide()
     {
         return IsOnWall() && _handChecker.IsColliding()
                           && _footChecker.IsColliding();
+    }
+
+    /**
+    * 玩家受到攻击回调
+     */
+    private void OnHurtBoxHurt(HitBox hitBox)
+    {
+        if (_invincibleTimer.TimeLeft > 0)
+            return;
+        _pendingDamage = new();
+        _pendingDamage.Amount = 1;
+        _pendingDamage.Source = hitBox.Owner as Node2D;
+    }
+    
+    private void Die()
+    {
+        QueueFree();
+        //重新加载场景
+        GetTree().ReloadCurrentScene();
     }
 }

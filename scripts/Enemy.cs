@@ -11,12 +11,14 @@ public enum Direction
     Right = +1
 }
 
+[GlobalClass]
 public partial class Enemy : CharacterBody2D
 {
 
     protected Node2D Graphics;
     protected AnimationPlayer AnimationPlayer;
     protected StateMachine StateMachine;
+    protected Stats Stats;
 
     private Direction _direction = Direction.Left;
 
@@ -64,6 +66,7 @@ public partial class Enemy : CharacterBody2D
     {
         Graphics = GetNode<Node2D>("Graphics");
         AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+        Stats = GetNode<Stats>("Stats");
 
         StateMachine = new();
         AddChild(StateMachine);
@@ -74,5 +77,10 @@ public partial class Enemy : CharacterBody2D
         var x = Mathf.MoveToward(Velocity.X, speed * (int)Direction, Acceleration * delta);
         Velocity = new Vector2((float)x, Velocity.Y + (float)(Gravity * delta));
         MoveAndSlide();
+    }
+
+    private void Die()
+    {
+        QueueFree();
     }
 }

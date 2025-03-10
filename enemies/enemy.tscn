@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://cf8xlbjpfkomg"]
+[gd_scene load_steps=5 format=3 uid="uid://cf8xlbjpfkomg"]
 
 [ext_resource type="Script" uid="uid://cv8nbafe7n51c" path="res://scripts/Enemy.cs" id="1_fw1ev"]
+[ext_resource type="Script" uid="uid://c1a7885b361d6" path="res://scripts/HitBox.cs" id="2_7frlh"]
+[ext_resource type="Script" uid="uid://bcovgkvp4kadn" path="res://scripts/HurtBox.cs" id="3_orwns"]
+[ext_resource type="Script" uid="uid://dkanpsyprm1hp" path="res://scripts/Stats.cs" id="4_a6vjd"]
 
 [node name="Enemy" type="CharacterBody2D"]
 collision_layer = 4
@@ -10,6 +13,22 @@ script = ExtResource("1_fw1ev")
 
 [node name="Sprite2D" type="Sprite2D" parent="Graphics"]
 
+[node name="HitBox" type="Area2D" parent="Graphics"]
+collision_layer = 0
+collision_mask = 8
+script = ExtResource("2_7frlh")
+metadata/_custom_type_script = "uid://c1a7885b361d6"
+
+[node name="HurtBox" type="Area2D" parent="Graphics"]
+collision_layer = 16
+collision_mask = 0
+script = ExtResource("3_orwns")
+metadata/_custom_type_script = "uid://bcovgkvp4kadn"
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="Stats" type="Node" parent="."]
+script = ExtResource("4_a6vjd")
+metadata/_custom_type_script = "uid://dkanpsyprm1hp"

@@ -21,4 +21,10 @@ public abstract class Constants
     
     //蹬墙跳速度
     public static Vector2 WallJumpVelocity = new(500, -300);
+
+    //怪物受击后被击飞的速度
+    public const float KnockBackAmount = 512;
+    
+    //保持当前状态
+    public const int KeepCurrent = -1;
 }

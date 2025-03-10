@@ -6,9 +6,12 @@ namespace bravestory.enemies;
 
 public enum State
 {
+    KeepCurrent = Constants.KeepCurrent,
     Idle,
     Walk,
-    Run
+    Run,
+    Hurt,
+    Dying
 }
 
 public partial class Boar : Enemy
@@ -18,6 +21,8 @@ public partial class Boar : Enemy
     private RayCast2D _floorChecker;
     private RayCast2D _playerChecker;
     private Timer _calmDownTimer; //冷静计时器
+    
+    private Damage _pendingDamage; //待处理伤害
 
     public override void _Ready()
     {
@@ -33,6 +38,8 @@ public partial class Boar : Enemy
         switch (state)
         {
             case State.Idle:
+            case State.Dying:
+            case State.Hurt:
                 Move(0, delta);
                 break;
             case State.Walk:
@@ -51,29 +58,42 @@ public partial class Boar : Enemy
 
     private State GetNextState(State state)
     {
-        if (CanSeePlayer())
-        {
-            return State.Run;
-        }
+        if (Stats.Health == 0)
+            if (state == State.Dying)
+                return State.KeepCurrent;
+            else
+                return State.Dying;
+
+        if (_pendingDamage != null)
+            return State.Hurt;
 
         switch (state)
         {
             case State.Idle:
+                if (CanSeePlayer())
+                    return State.Run;
                 //idle状态大于2秒,进入Walk状态
                 if (StateMachine.StateTime > 2)
                     return State.Walk;
                 break;
             case State.Walk:
+                if (CanSeePlayer())
+                    return State.Run;
                 //前面是墙或者是悬崖
                 if (_wallChecker.IsColliding() || !_floorChecker.IsColliding())
                     return State.Idle;
                 break;
             case State.Run:
-                if (_calmDownTimer.IsStopped())
+                if (!CanSeePlayer() && _calmDownTimer.IsStopped())
                     return State.Walk;
                 break;
+            case State.Hurt:
+                if (!AnimationPlayer.IsPlaying())
+                    return State.Run;
+                break;
         }
-        return state;
+
+        return State.KeepCurrent;
     }
 
     private void TransitionState(State from, State to)
@@ -101,6 +121,22 @@ public partial class Boar : Enemy
             case State.Run:
                 AnimationPlayer.Play("run");
                 break;
+            case State.Hurt:
+                AnimationPlayer.Play("hit");
+                //扣血
+                Stats.Health -= _pendingDamage.Amount;
+                //计算相对方向
+                var dir = _pendingDamage.Source.GlobalPosition.DirectionTo(GlobalPosition);
+                //击退
+                Velocity = dir * Constants.KnockBackAmount;
+                //如果怪物背对玩家，则回头
+                Direction = dir.X > 0 ? Direction.Left : Direction.Right;
+                //重置伤害
+                _pendingDamage = null;
+                break;
+            case State.Dying:
+                AnimationPlayer.Play("die");
+                break;
         }
     }
 
@@ -112,5 +148,15 @@ public partial class Boar : Enemy
         }
         //判断射线跟哪个物体发生碰撞
         return _playerChecker.GetCollider() is Player;
+    }
+
+    /**
+     * 野猪受到攻击回调
+     */
+    private void OnHurtBoxHurt(HitBox hitBox)
+    {
+        _pendingDamage = new();
+        _pendingDamage.Amount = 1;
+        _pendingDamage.Source = hitBox.Owner as Node2D;
     }
 }

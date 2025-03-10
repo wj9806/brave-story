@@ -2,6 +2,7 @@ using Godot;
 
 namespace bravestory.scripts;
 
+[GlobalClass]
 public partial class StateMachine : Node
 {
 
@@ -41,8 +42,7 @@ public partial class StateMachine : Node
 		while (true)
 		{
 			int next =  GetParent().Call("GetNextState", _currentState).AsInt32();
-			
-			if (_currentState == next) break;
+			if (Constants.KeepCurrent == next) break;
 			
 			CurrentState = next;
 		}
