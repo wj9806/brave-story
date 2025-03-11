@@ -510,9 +510,13 @@ public partial class Player : CharacterBody2D
     
     private void Die()
     {
-        QueueFree();
+        //QueueFree();
         //重新加载场景
-        GetTree().ReloadCurrentScene();
+        //GetTree().ReloadCurrentScene();
+        
+        //死亡后，在出生点复活
+        var game = GetParent().GetNode<Game>("/root/Game");
+        game.ChangeScene("res://world.tscn", "BornEntry");
     }
 
     public void AddInteractable(Interactable interactable)

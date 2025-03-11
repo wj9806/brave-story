@@ -633,6 +633,11 @@ position = Vector2(696, 207)
 script = ExtResource("4_ioo17")
 metadata/_custom_type_script = "uid://kc2n7d3bc87y"
 
+[node name="BornEntry" type="Marker2D" parent="TileMapLayer"]
+position = Vector2(129, 150)
+script = ExtResource("4_ioo17")
+metadata/_custom_type_script = "uid://kc2n7d3bc87y"
+
 [node name="Player" parent="." instance=ExtResource("2_fj7yv")]
 z_index = 150
 position = Vector2(153, 161)
