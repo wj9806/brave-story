@@ -27,4 +27,16 @@ public abstract class Constants
     
     //保持当前状态
     public const int KeepCurrent = -1;
+
+    //滑铲时间
+    public const double SlidingDuration = 0.3d;
+
+    //滑铲速度
+    public const float SlidingSpeed = 200;
+    
+    //高度
+    public const float LandingHeight = 100.0f;
+
+    //滑铲所需能量
+    public const double SlidingEnergy = 4.0d;
 }

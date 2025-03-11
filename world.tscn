@@ -759,14 +759,6 @@ texture = ExtResource("1_f3sb7")
 region_enabled = true
 region_rect = Rect2(210, 293, 124, 86)
 
-[node name="CoyoteTimer" type="Timer" parent="."]
-wait_time = 0.1
-one_shot = true
-
-[node name="JumpRequestTimer" type="Timer" parent="."]
-wait_time = 0.1
-one_shot = true
-
 [node name="Boar" parent="." instance=ExtResource("7_pkg7o")]
 z_index = 150
 position = Vector2(79, 196)

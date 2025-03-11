@@ -5,13 +5,13 @@ namespace bravestory.scripts;
 public partial class Health : HBoxContainer
 {
  
-    private TextureProgressBar _healthBar;
-    private TextureProgressBar _easedHealthBar;
+    protected TextureProgressBar _healthBar;
+    protected TextureProgressBar _easedHealthBar;
 
     [Export]
     public Stats Stats { get; set; }
 
-    private void UpdateHeath()
+    protected void UpdateHeath()
     {
         var percentage = (float)Stats.Health / Stats.MaxHealth;
         _healthBar.Value = percentage;

@@ -19,7 +19,10 @@ public enum State
     Attack2,
     Attack3,
     Hurt,
-    Dying
+    Dying,
+    SlidingStart,
+    SlidingLoop,
+    SlidingEnd
 }
 
 public partial class Player : CharacterBody2D
@@ -28,6 +31,7 @@ public partial class Player : CharacterBody2D
     private AnimationPlayer _animationPlayer;
     private Timer _coyoteTimer;
     private Timer _jumpRequestTimer;
+    private Timer _slideRequestTimer;
     private StateMachine _stateMachine;
     private HurtBox _hurtBox;
     private RayCast2D _handChecker;
@@ -42,6 +46,7 @@ public partial class Player : CharacterBody2D
     private static readonly List<State> GroundStates = new();
 
     private bool _canCombo;
+    private float _fallFromY; //角色从多高掉落
 
     [Export]
     public bool CanCombo
@@ -54,8 +59,9 @@ public partial class Player : CharacterBody2D
     {
         _graphics = GetNode<Node2D>("Graphics");
         _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-        _coyoteTimer = GetParent().GetNode<Timer>("CoyoteTimer");
-        _jumpRequestTimer = GetParent().GetNode<Timer>("JumpRequestTimer");
+        _coyoteTimer = GetNode<Timer>("CoyoteTimer");
+        _jumpRequestTimer = GetNode<Timer>("JumpRequestTimer");
+        _slideRequestTimer = GetNode<Timer>("SlideRequestTimer");
         _handChecker = _graphics.GetNode<RayCast2D>("HandChecker");
         _footChecker = _graphics.GetNode<RayCast2D>("FootChecker");
         _stats = GetNode<Stats>("Stats");
@@ -92,6 +98,12 @@ public partial class Player : CharacterBody2D
         if (@event.IsActionPressed("attack") && _canCombo)
         {
             _isComboRequested = true;
+        }
+
+        //滑铲按键预输入
+        if (@event.IsActionPressed("slide"))
+        {
+            _slideRequestTimer.Start();
         }
     }
 
@@ -154,9 +166,28 @@ public partial class Player : CharacterBody2D
             case State.Dying:
                 Stand(Gravity, delta);
                 break;
+            case State.SlidingEnd:
+                Stand(Gravity, delta);
+                break;
+            case State.SlidingStart:
+            case State.SlidingLoop:
+                Slide(delta);
+                break;
         }
 
         _isFirstTick = false;
+    }
+
+    private void Slide(double delta)
+    {
+        Vector2 v = new()
+        {
+            X = _graphics.Scale.X * SlidingSpeed,
+            Y = Velocity.Y + (float) (Gravity * delta)
+        };
+        Velocity = v;
+
+        MoveAndSlide();
     }
 
     private void Move(double gravity, double delta)
@@ -218,21 +249,30 @@ public partial class Player : CharacterBody2D
             case State.Idle:
                 if (Input.IsActionJustPressed("attack"))
                     return State.Attack1;
+                if (ShouldSlide())
+                    return State.SlidingStart;
                 if (!isStill)
                     return State.Running;
                 break;
             case State.Fall:
                 if (IsOnFloor())
+                {
+                    var height = GlobalPosition.Y - _fallFromY;
                     if (isStill)
-                        return State.Landing;
-                    else
-                        return State.Running;
+                        if (height >= LandingHeight)
+                            return State.Landing;
+                        else
+                           return State.Idle;
+                    return State.Running;
+                }
                 if (CanWallSlide())
                     return State.WallSliding;
                 break;
             case State.Running:
                 if (Input.IsActionJustPressed("attack"))
                     return State.Attack1;
+                if (ShouldSlide())
+                    return State.SlidingStart;
                 if (isStill)
                     return State.Idle;
                 break;
@@ -284,9 +324,31 @@ public partial class Player : CharacterBody2D
                 if (!_animationPlayer.IsPlaying())
                     return State.Idle;
                 break;
+            case State.SlidingStart:
+                if (!_animationPlayer.IsPlaying())
+                    return State.SlidingLoop;
+                break;
+            case State.SlidingLoop:
+                //如果靠墙或者大于滑铲时间
+                if (_stateMachine.StateTime > SlidingDuration || IsOnWall())
+                    return State.SlidingEnd;
+                break;
+            case State.SlidingEnd:
+                if (!_animationPlayer.IsPlaying())
+                    return State.Idle;
+                break;
         }
 
         return State.KeepCurrent;
+    }
+
+    private bool ShouldSlide()
+    {
+        if (_slideRequestTimer.IsStopped())
+            return false;
+        if (_stats.Energy < SlidingEnergy)
+            return false;
+        return !_footChecker.IsColliding();
     }
 
     /**
@@ -311,6 +373,7 @@ public partial class Player : CharacterBody2D
                 {
                     _coyoteTimer.Start();
                 }
+                _fallFromY = GlobalPosition.Y;
                 break;
             case State.Running:
                 _animationPlayer.Play("running");
@@ -361,6 +424,17 @@ public partial class Player : CharacterBody2D
             case State.Dying:
                 _animationPlayer.Play("die");
                 _invincibleTimer.Stop();
+                break;
+            case State.SlidingStart:
+                _animationPlayer.Play("sliding_start");
+                _slideRequestTimer.Stop();
+                _stats.Energy -= SlidingEnergy;
+                break;
+            case State.SlidingLoop:
+                _animationPlayer.Play("sliding_loop");
+                break;
+            case State.SlidingEnd:
+                _animationPlayer.Play("sliding_end");
                 break;
         }
 

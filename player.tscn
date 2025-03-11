@@ -2204,4 +2204,16 @@ offset_right = 83.0
 offset_bottom = 23.0
 Stats = NodePath("../../Stats")
 
+[node name="CoyoteTimer" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+
+[node name="JumpRequestTimer" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+
+[node name="SlideRequestTimer" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+
 [connection signal="Hurt" from="Graphics/HurtBox" to="." method="OnHurtBoxHurt"]
