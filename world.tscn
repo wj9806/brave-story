@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=4 uid="uid://cil41iuky5nbk"]
+[gd_scene load_steps=14 format=4 uid="uid://cil41iuky5nbk"]
 
 [ext_resource type="Texture2D" uid="uid://gf1obiel2q1w" path="res://assets/Tree-Assets.png" id="1_f3sb7"]
 [ext_resource type="Script" uid="uid://b4w817kk54ua1" path="res://scripts/World.cs" id="1_tlwt5"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://i7ra7efwnu03" path="res://assets/Legacy-Fantasy - High Forest 2.3/Trees/Background.png" id="5_036b0"]
 [ext_resource type="Texture2D" uid="uid://bnu8yqqc404ks" path="res://assets/Legacy-Fantasy - High Forest 2.3/Trees/Golden-Tree.png" id="6_dwbse"]
 [ext_resource type="PackedScene" uid="uid://r3yu4lqbp00b" path="res://enemies/boar.tscn" id="7_pkg7o"]
+[ext_resource type="Script" uid="uid://drf6a7wohnaby" path="res://scripts/Interactable.cs" id="8_gbfbk"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fj7yv"]
 texture = ExtResource("1_f3sb7")
@@ -587,6 +588,9 @@ texture = ExtResource("1_f3sb7")
 [sub_resource type="TileSet" id="TileSet_aqk2v"]
 sources/0 = SubResource("TileSetAtlasSource_tlwt5")
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ioo17"]
+size = Vector2(11, 17)
+
 [node name="World" type="Node2D"]
 script = ExtResource("1_tlwt5")
 
@@ -598,7 +602,7 @@ tile_set = SubResource("TileSet_tlwt5")
 
 [node name="Player" parent="." instance=ExtResource("2_fj7yv")]
 z_index = 150
-position = Vector2(228, 191)
+position = Vector2(153, 161)
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
 position = Vector2(1, -36)
@@ -761,4 +765,13 @@ region_rect = Rect2(210, 293, 124, 86)
 
 [node name="Boar" parent="." instance=ExtResource("7_pkg7o")]
 z_index = 150
-position = Vector2(79, 196)
+position = Vector2(79, 198)
+
+[node name="Interactable" type="Area2D" parent="."]
+position = Vector2(208, 184)
+script = ExtResource("8_gbfbk")
+metadata/_custom_type_script = "uid://drf6a7wohnaby"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Interactable"]
+position = Vector2(-0.5, 3.5)
+shape = SubResource("RectangleShape2D_ioo17")

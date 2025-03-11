@@ -509,8 +509,8 @@ one_shot = true
 
 [node name="EnemyHealth" parent="." index="5" node_paths=PackedStringArray("Stats") instance=ExtResource("7_qb4tn")]
 offset_left = -18.0
-offset_top = -41.0
-offset_bottom = -1.0
+offset_top = -36.0
+offset_bottom = 4.0
 scale = Vector2(0.584661, 0.540392)
 Stats = NodePath("../Stats")
 

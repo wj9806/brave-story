@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using static bravestory.scripts.Constants;
 
@@ -39,11 +40,15 @@ public partial class Player : CharacterBody2D
     private Damage _pendingDamage; //待处理伤害
     private Stats _stats;
     private Timer _invincibleTimer; //受击后的无敌计时器
-    
+    private AnimatedSprite2D _interactionIcon;
+
+    //与玩家的交互物体
+    private readonly List<Interactable> _interactableWithList = [];
+
     private bool _isFirstTick; //是否是状态改变的第一帧
     private bool _isComboRequested = false; //是否发生combo
     
-    private static readonly List<State> GroundStates = new();
+    private static readonly List<State> GroundStates = [];
 
     private bool _canCombo;
     private float _fallFromY; //角色从多高掉落
@@ -66,6 +71,7 @@ public partial class Player : CharacterBody2D
         _footChecker = _graphics.GetNode<RayCast2D>("FootChecker");
         _stats = GetNode<Stats>("Stats");
         _invincibleTimer = GetNode<Timer>("InvincibleTimer");
+        _interactionIcon = GetNode<AnimatedSprite2D>("InteractionIcon");
 
         _stateMachine = new StateMachine();
         AddChild(_stateMachine);
@@ -105,10 +111,16 @@ public partial class Player : CharacterBody2D
         {
             _slideRequestTimer.Start();
         }
+
+        if (@event.IsActionPressed("interact") && _interactableWithList.Count > 0)
+        {
+            _interactableWithList.Last().InteractHandler();
+        }
     }
 
     private void TickPhysics(State state, double delta)
     {
+        _interactionIcon.Visible = _interactableWithList.Count > 0;
         if (_invincibleTimer.TimeLeft > 0)
         {
             //玩家无敌
@@ -424,6 +436,7 @@ public partial class Player : CharacterBody2D
             case State.Dying:
                 _animationPlayer.Play("die");
                 _invincibleTimer.Stop();
+                _interactableWithList.Clear();
                 break;
             case State.SlidingStart:
                 _animationPlayer.Play("sliding_start");
@@ -474,5 +487,19 @@ public partial class Player : CharacterBody2D
         QueueFree();
         //重新加载场景
         GetTree().ReloadCurrentScene();
+    }
+
+    public void AddInteractable(Interactable interactable)
+    {
+        if (_stateMachine.CurrentState == (int)State.Dying)
+            return;
+        if (_interactableWithList.Contains(interactable))
+            return;
+        _interactableWithList.Add(interactable);
+    }
+
+    public void RemoveInteractable(Interactable interactable)
+    {
+        _interactableWithList.Remove(interactable);
     }
 }
