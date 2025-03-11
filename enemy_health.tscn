@@ -1,0 +1,45 @@
+[gd_scene load_steps=6 format=3 uid="uid://bap2hytbk0knp"]
+
+[ext_resource type="Texture2D" uid="uid://drrghcbea0yrw" path="res://assets/Legacy-Fantasy - High Forest 2.3/HUD/Base-01.png" id="1_eac7v"]
+[ext_resource type="Script" uid="uid://l4sdpwqegtw2" path="res://scripts/EnemyHealth.cs" id="1_o1ru8"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o1ru8"]
+atlas = ExtResource("1_eac7v")
+region = Rect2(307, 21, 58, 6)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p1kdi"]
+atlas = ExtResource("1_eac7v")
+region = Rect2(308, 118, 56, 4)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kud3p"]
+atlas = ExtResource("1_eac7v")
+region = Rect2(308, 86, 56, 4)
+
+[node name="EnemyHealth" type="HBoxContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(0.431828, 0.501058)
+script = ExtResource("1_o1ru8")
+
+[node name="HealthBar" type="TextureProgressBar" parent="."]
+layout_mode = 2
+max_value = 1.0
+step = 0.0
+value = 1.0
+texture_over = SubResource("AtlasTexture_o1ru8")
+texture_progress = SubResource("AtlasTexture_p1kdi")
+texture_progress_offset = Vector2(1, 1)
+
+[node name="EasedHealthBar" type="TextureProgressBar" parent="HealthBar"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+max_value = 1.0
+step = 0.0
+value = 1.0
+texture_progress = SubResource("AtlasTexture_kud3p")
+texture_progress_offset = Vector2(1, 1)

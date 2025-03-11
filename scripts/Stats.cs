@@ -21,11 +21,18 @@ public partial class Stats : Node
 	public int Health
 	{
 		get => _health;
-		set => _health = Math.Clamp(value, 0, MaxHealth);
+		set
+		{
+			_health = Math.Clamp(value, 0, MaxHealth);
+			EmitSignal(SignalName.HealthChanged);
+		}
 	}
 
 	public override void _Ready()
 	{
 		Health = MaxHealth;
 	}
+	
+	[Signal]
+	public delegate void HealthChangedEventHandler();
 }
