@@ -8,11 +8,13 @@ public partial class World : Node2D
     
     private TileMapLayer _tileMapLayer;
     private Camera2D _camera2D;
+    private Player _player;
 
     public override void _Ready()
     {
         _tileMapLayer = GetNode<TileMapLayer>("TileMapLayer");      
         _camera2D = GetNode<Camera2D>("Player/Camera2D");
+        _player = GetNode<Player>("Player");
 
         //设置相机边界
         var usedRect = _tileMapLayer.GetUsedRect().Grow(-1);
@@ -22,6 +24,13 @@ public partial class World : Node2D
         _camera2D.LimitLeft = usedRect.Position.X * tileSize.X + (int)Math.Floor(_tileMapLayer.Position.X);
         _camera2D.LimitRight = usedRect.End.X * tileSize.X + (int)Math.Floor(_tileMapLayer.Position.X);
         _camera2D.ResetSmoothing();
+        _camera2D.ForceUpdateScroll();
     }
 
+    public void UpdatePlayer(Vector2 vector2)
+    {
+        _player.GlobalPosition = vector2;
+        _camera2D.ResetSmoothing();
+        _camera2D.ForceUpdateScroll();
+    }
 }

@@ -32,9 +32,8 @@ public partial class Interactable : Area2D
 		player.RemoveInteractable(this);
 	}
 
-	public void InteractHandler()
+	public virtual void InteractHandler()
 	{
-		GD.Print("Interact: " + Name);
 		EmitSignal(SignalName.Interact);
 	}
 

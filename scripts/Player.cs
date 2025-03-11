@@ -53,6 +53,32 @@ public partial class Player : CharacterBody2D
     private bool _canCombo;
     private float _fallFromY; //角色从多高掉落
 
+    private Direction _direction = Direction.Left;
+
+    [Export]
+    public Direction Direction
+    {
+        get => _direction;
+        set
+        {
+            _direction = value;
+            WaitReady();
+            _graphics.Scale = new()
+            {
+                X = (int)_direction, 
+                Y = _graphics.Scale.Y
+            };
+        }
+    }
+
+    private async void WaitReady()
+    {
+        if (!IsNodeReady())
+        {
+            await ToSignal(this, Node.SignalName.Ready);
+        }
+    }
+
     [Export]
     public bool CanCombo
     {
@@ -151,7 +177,7 @@ public partial class Player : CharacterBody2D
                 if (_stateMachine.StateTime < 0.1)
                 {
                     Stand(_isFirstTick ? 0 : Gravity, delta);
-                    _graphics.SetScale(new Vector2(GetWallNormal().X, _graphics.Scale.Y));
+                    Direction = (Direction)GetWallNormal().X;
                 }
                 else
                 {
@@ -169,7 +195,7 @@ public partial class Player : CharacterBody2D
                     Move(Gravity / 4, delta);
                 else
                     Move(Gravity, delta);
-                _graphics.SetScale(new Vector2(GetWallNormal().X, _graphics.Scale.Y));
+                Direction = (Direction)GetWallNormal().X;
                 break;
             case State.Attack1:
             case State.Attack2:
@@ -194,7 +220,7 @@ public partial class Player : CharacterBody2D
     {
         Vector2 v = new()
         {
-            X = _graphics.Scale.X * SlidingSpeed,
+            X = (int)Direction * SlidingSpeed,
             Y = Velocity.Y + (float) (Gravity * delta)
         };
         Velocity = v;
@@ -204,16 +230,16 @@ public partial class Player : CharacterBody2D
 
     private void Move(double gravity, double delta)
     {
-        var direction = Input.GetAxis("move_left", "move_right");
+        var movement = Input.GetAxis("move_left", "move_right");
 
         float acc = IsOnFloor() ? FloorAcceleration : AirAcceleration;
-        var vec = new Vector2(Mathf.MoveToward(Velocity.X, direction * RunSpeed, 
+        var vec = new Vector2(Mathf.MoveToward(Velocity.X, movement * RunSpeed, 
             (float)delta * acc), Velocity.Y + (float)(gravity * delta));
         Velocity = vec;
 
-        if (!Mathf.IsZeroApprox(direction))
+        if (!Mathf.IsZeroApprox(movement))
         {
-            _graphics.SetScale(new Vector2(direction < 0 ? -1.0f : 1.0f, _graphics.Scale.Y));
+            Direction = movement < 0 ? Direction.Left : Direction.Right;
         }
 
         MoveAndSlide();
@@ -252,9 +278,9 @@ public partial class Player : CharacterBody2D
             return State.Fall;
         }
         
-        var direction = Input.GetAxis("move_left", "move_right");
+        var movement = Input.GetAxis("move_left", "move_right");
         //是否站立不动
-        bool isStill = Mathf.IsZeroApprox(direction) && Mathf.IsZeroApprox(Velocity.X);
+        bool isStill = Mathf.IsZeroApprox(movement) && Mathf.IsZeroApprox(Velocity.X);
         
         switch (state)
         {

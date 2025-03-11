@@ -2258,6 +2258,6 @@ position = Vector2(0, -41)
 scale = Vector2(0.800682, 0.767372)
 sprite_frames = SubResource("SpriteFrames_bwjto")
 autoplay = "default"
-frame_progress = 0.670004
+frame_progress = 0.602915
 
 [connection signal="Hurt" from="Graphics/HurtBox" to="." method="OnHurtBoxHurt"]

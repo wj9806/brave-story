@@ -1,15 +1,7 @@
 using Godot;
-using System;
-using bravestory.scripts;
 using static bravestory.scripts.Constants;
 
 namespace bravestory.scripts;
-
-public enum Direction
-{
-    Left = -1,
-    Right = +1
-}
 
 [GlobalClass]
 public partial class Enemy : CharacterBody2D
