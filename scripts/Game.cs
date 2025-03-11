@@ -4,7 +4,14 @@ namespace bravestory.scripts;
 
 public partial class Game : Node
 {
-	
+	private Stats _playerStats;
+
+	public Stats PlayerStats
+	{
+		get;
+		set;
+	}
+
 	public Node CurrentScene { get; set; }
 
 	public override void _Ready()
@@ -12,6 +19,8 @@ public partial class Game : Node
 		Viewport root = GetTree().Root;
 		// 根节点的最后一个子节点始终是加载的场景。
 		CurrentScene = root.GetChild(-1);
+
+		PlayerStats = GetNode<Stats>("PlayerStats");
 	}
 	
 	public void ChangeScene(string path, string entryPoint)
@@ -43,9 +52,9 @@ public partial class Game : Node
 		{
 			if (node.Name == entryPoint)
 			{
-				if (node is Marker2D marker)
+				if (node is EntryPoint ep)
 				{
-					((World)tree.CurrentScene).UpdatePlayer(marker.GetGlobalPosition());
+					((World)tree.CurrentScene).UpdatePlayer(ep.GetGlobalPosition(), ep.Direction);
 				}
 				break;
 			}

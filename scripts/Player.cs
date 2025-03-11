@@ -95,7 +95,7 @@ public partial class Player : CharacterBody2D
         _slideRequestTimer = GetNode<Timer>("SlideRequestTimer");
         _handChecker = _graphics.GetNode<RayCast2D>("HandChecker");
         _footChecker = _graphics.GetNode<RayCast2D>("FootChecker");
-        _stats = GetNode<Stats>("Stats");
+        _stats = GetParent().GetNode<Game>("/root/Game").PlayerStats;
         _invincibleTimer = GetNode<Timer>("InvincibleTimer");
         _interactionIcon = GetNode<AnimatedSprite2D>("InteractionIcon");
 
@@ -517,6 +517,7 @@ public partial class Player : CharacterBody2D
         //死亡后，在出生点复活
         var game = GetParent().GetNode<Game>("/root/Game");
         game.ChangeScene("res://world.tscn", "BornEntry");
+        _stats.Health = _stats.MaxHealth;
     }
 
     public void AddInteractable(Interactable interactable)

@@ -24,12 +24,12 @@ public partial class World : Node2D
         _camera2D.LimitLeft = usedRect.Position.X * tileSize.X + (int)Math.Floor(_tileMapLayer.Position.X);
         _camera2D.LimitRight = usedRect.End.X * tileSize.X + (int)Math.Floor(_tileMapLayer.Position.X);
         _camera2D.ResetSmoothing();
-        _camera2D.ForceUpdateScroll();
     }
 
-    public void UpdatePlayer(Vector2 vector2)
+    public void UpdatePlayer(Vector2 vector2, Direction direction)
     {
         _player.GlobalPosition = vector2;
+        _player.Direction = direction;
         _camera2D.ResetSmoothing();
         _camera2D.ForceUpdateScroll();
     }

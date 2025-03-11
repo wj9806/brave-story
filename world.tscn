@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://bnu8yqqc404ks" path="res://assets/Legacy-Fantasy - High Forest 2.3/Trees/Golden-Tree.png" id="6_dwbse"]
 [ext_resource type="PackedScene" uid="uid://r3yu4lqbp00b" path="res://enemies/boar.tscn" id="7_pkg7o"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fj7yv"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ioo17"]
 texture = ExtResource("1_f3sb7")
 1:2/0 = 0
 1:2/0/terrain_set = 0
@@ -296,7 +296,7 @@ physics_layer_0/collision_layer = 1
 terrain_set_0/mode = 1
 terrain_set_0/terrain_0/name = "Trunk"
 terrain_set_0/terrain_0/color = Color(0.5, 0.34375, 0.25, 1)
-sources/0 = SubResource("TileSetAtlasSource_fj7yv")
+sources/0 = SubResource("TileSetAtlasSource_ioo17")
 
 [sub_resource type="SegmentShape2D" id="SegmentShape2D_gbfbk"]
 a = Vector2(112, -8)
@@ -604,43 +604,29 @@ tile_set = SubResource("TileSet_tlwt5")
 
 [node name="MineGate" parent="TileMapLayer" instance=ExtResource("3_gbfbk")]
 position = Vector2(671, 82)
-Path = "uid://cil41iuky5nbk"
-EntryPoint = "TopEntry"
+Path = "uid://utkqmypqs2v1"
+EntryPoint = "CaveEntry"
 
 [node name="StaticBody2D" type="StaticBody2D" parent="TileMapLayer/MineGate"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TileMapLayer/MineGate/StaticBody2D"]
 shape = SubResource("SegmentShape2D_gbfbk")
 
-[node name="MineGate2" parent="TileMapLayer" instance=ExtResource("3_gbfbk")]
-position = Vector2(57, -48)
-scale = Vector2(-1, 1)
-Path = "uid://cil41iuky5nbk"
-EntryPoint = "BottomEntry"
-
-[node name="StaticBody2D" type="StaticBody2D" parent="TileMapLayer/MineGate2"]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="TileMapLayer/MineGate2/StaticBody2D"]
-shape = SubResource("SegmentShape2D_gbfbk")
-
-[node name="TopEntry" type="Marker2D" parent="TileMapLayer"]
-position = Vector2(32, 79)
-script = ExtResource("4_ioo17")
-metadata/_custom_type_script = "uid://kc2n7d3bc87y"
-
 [node name="BottomEntry" type="Marker2D" parent="TileMapLayer"]
 position = Vector2(696, 207)
 script = ExtResource("4_ioo17")
+Direction = -1
 metadata/_custom_type_script = "uid://kc2n7d3bc87y"
 
 [node name="BornEntry" type="Marker2D" parent="TileMapLayer"]
 position = Vector2(129, 150)
 script = ExtResource("4_ioo17")
+Direction = -1
 metadata/_custom_type_script = "uid://kc2n7d3bc87y"
 
 [node name="Player" parent="." instance=ExtResource("2_fj7yv")]
 z_index = 150
-position = Vector2(153, 161)
+position = Vector2(153, 160)
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
 position = Vector2(1, -36)

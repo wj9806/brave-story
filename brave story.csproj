@@ -4,4 +4,7 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>bravestory</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="scripts\BaseScene.cs" />
+  </ItemGroup>
 </Project>
