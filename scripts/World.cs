@@ -1,4 +1,7 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 namespace bravestory.scripts;
@@ -33,5 +36,31 @@ public partial class World : Node2D
         _player.Direction = direction;
         _camera2D.ResetSmoothing();
         _camera2D.ForceUpdateScroll();
+    }
+
+    public Hashtable ToDict()
+    {
+        var hashtable = new Hashtable();
+        var nodes = GetTree().GetNodesInGroup("enemies");
+
+        List<String> list = [];
+        list.AddRange(nodes.Select(node => GetPathTo(node).ToString()));
+        hashtable.Add("enemies_alive", list);
+        return hashtable;
+    }
+
+    public void FromDict(Hashtable dict)
+    {
+        var nodePaths = dict["enemies_alive"] as List<String>;
+
+        foreach (var node in GetTree().GetNodesInGroup("enemies"))
+        {
+            var path = GetPathTo(node).ToString();
+
+            if (nodePaths != null && !nodePaths.Contains(path))
+            {
+                node.QueueFree();
+            }
+        }
     }
 }

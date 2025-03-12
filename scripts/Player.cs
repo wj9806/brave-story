@@ -521,7 +521,7 @@ public partial class Player : CharacterBody2D
         
         //死亡后，在出生点复活
         var game = GetParent().GetNode<Game>("/root/Game");
-        game.ChangeScene("res://world.tscn", "BornEntry");
+        game.ChangeScene("res://world.tscn", "BornEntry", null);
         _stats.Health = _stats.MaxHealth;
     }
 

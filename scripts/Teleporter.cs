@@ -19,6 +19,6 @@ public partial class Teleporter : Interactable
         base.InteractHandler();
         //切换场景
         var game = GetNode<Game>("/root/Game");
-        game.ChangeScene(Path, EntryPoint);
+        game.ChangeScene(Path, EntryPoint, null);
     }
 }

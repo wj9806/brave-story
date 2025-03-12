@@ -24,11 +24,13 @@ public partial class Interactable : Area2D
 
 	private void OnBodyEntered(Player player)
 	{
+		GD.Print("OnBodyEntered");
 		player.AddInteractable(this);
 	}
 	
 	private void OnBodyExited(Player player)
 	{
+		GD.Print("OnBodyExited");
 		player.RemoveInteractable(this);
 	}
 

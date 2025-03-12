@@ -1,3 +1,7 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Godot;
 
@@ -10,6 +14,8 @@ public partial class Game : CanvasLayer
 	
 	private Stats _playerStats;
 	private ColorRect _colorRect;
+
+	private Dictionary<string, Hashtable> _worldStates = new();
 
 	public Stats PlayerStats
 	{
@@ -31,7 +37,7 @@ public partial class Game : CanvasLayer
 		PlayerStats = GetNode<Stats>("PlayerStats");
 	}
 	
-	public async void ChangeScene(string path, string entryPoint)
+	public async void ChangeScene(string path, string entryPoint, string gameDataJson)
 	{
 		var tree = GetTree();
 		tree.Paused = true;
@@ -41,8 +47,18 @@ public partial class Game : CanvasLayer
 		tween.TweenProperty(_colorRect, "color:a", 1, 0.2);
 		await WaitTween(tween);
 		
-		CallDeferred(MethodName.DeferredGotoScene, path, entryPoint);
-		
+		if (gameDataJson != null)
+		{
+			//加载用户状态
+			var gameData = JsonSerializer.Deserialize<GameData>(gameDataJson);
+			PlayerStats.FromDict(gameData.Stats);
+			CallDeferred(MethodName.DeferredGotoScene, path, entryPoint, JsonSerializer.Serialize(gameData.Player));
+		}
+		else
+		{
+			CallDeferred(MethodName.DeferredGotoScene, path, entryPoint, "");
+		}
+
 		tree.Paused = false;
 	
 		tween = CreateTween();
@@ -56,8 +72,12 @@ public partial class Game : CanvasLayer
 		await ToSignal(tween, Tween.SignalName.Finished);
 	}
 
-	public void DeferredGotoScene(string path, string entryPoint)
+	public void DeferredGotoScene(string path, string entryPoint, string playerJson)
 	{
+		//保存当前场景数据
+		var baseName = CurrentScene.SceneFilePath.GetFile().GetBaseName();
+		_worldStates[baseName] = ((World)CurrentScene).ToDict();
+		
 		//销毁当前场景
 		CurrentScene.Free();
 
@@ -69,22 +89,34 @@ public partial class Game : CanvasLayer
 
 		//添加到节点树
 		GetTree().Root.AddChild(CurrentScene);
-
-		// Optionally, to make it compatible with the SceneTree.change_scene_to_file() API.
 		GetTree().CurrentScene = CurrentScene;
-
 		
-		//设置Player的落地位置
-		var tree = GetTree();
-		foreach  (Node node in tree.GetNodesInGroup("entry_points"))
+		//加载场景数据
+		baseName = CurrentScene.SceneFilePath.GetFile().GetBaseName();
+		if (_worldStates.TryGetValue(baseName, out var state))
 		{
-			if (node.Name == entryPoint)
+			((World)CurrentScene).FromDict(state);
+		}
+
+		var tree = GetTree();
+		if (playerJson is { Length: > 0 })
+		{
+			GameData.PlayerData player = JsonSerializer.Deserialize<GameData.PlayerData>(playerJson);
+			((World)tree.CurrentScene).UpdatePlayer(new Vector2(player.PositionX, player.PositionY), (Direction)player.Direction);
+		}
+		else
+		{
+			//设置Player的落地位置
+			foreach  (Node node in tree.GetNodesInGroup("entry_points"))
 			{
-				if (node is EntryPoint ep)
+				if (node.Name == entryPoint)
 				{
-					((World)tree.CurrentScene).UpdatePlayer(ep.GetGlobalPosition(), ep.Direction);
+					if (node is EntryPoint ep)
+					{
+						((World)tree.CurrentScene).UpdatePlayer(ep.GetGlobalPosition(), ep.Direction);
+					}
+					break;
 				}
-				break;
 			}
 		}
 	}
@@ -92,5 +124,72 @@ public partial class Game : CanvasLayer
 	public void ShakeCamera(int amount)
 	{
 		EmitSignal(SignalName.CameraShouldShake, amount);
+	}
+
+	public void SaveGame()
+	{
+		var baseName = CurrentScene.SceneFilePath.GetFile().GetBaseName();
+		_worldStates[baseName] = ((World)CurrentScene).ToDict();
+		
+		var player = CurrentScene.GetNode<Player>("Player");
+
+		GameData pd = new()
+		{
+			WorldStates = _worldStates,
+			Stats = PlayerStats.ToDict(),
+			Scene = CurrentScene.SceneFilePath,
+			Player = new GameData.PlayerData
+			{
+				Direction = (int)player.Direction,
+				PositionX = player.Position.X,
+				PositionY = player.Position.Y
+			}
+		};
+
+		String json = JsonSerializer.Serialize(pd);
+		GD.Print("Saving game: " + json);
+		var file = FileAccess.Open(Constants.SavePath, FileAccess.ModeFlags.Write);
+		file.StoreString(json);
+	}
+
+	//读取存档代码写的有点沙雕,等待重构
+	public void LoadGame()
+	{
+		var file = FileAccess.Open(Constants.SavePath, FileAccess.ModeFlags.Read);
+		string txt = file.GetAsText();
+		GD.Print("Loading game data from " + txt);
+		
+		var gameData = JsonSerializer.Deserialize<GameData>(txt);
+		_worldStates = gameData.WorldStates;
+		ChangeScene(gameData.Scene, null, txt);
+	}
+
+	public override void _UnhandledInput(InputEvent @event)
+	{
+		if (@event.IsActionPressed("ui_cancel"))
+		{
+			LoadGame();
+		}
+	}
+
+	//游戏序列化数据
+	public class GameData
+	{
+		public Dictionary<string, Hashtable> WorldStates { get; set; }
+		
+		public Dictionary<string, object> Stats { get; set; }
+
+		public string Scene { get; set; }
+		
+		public PlayerData Player { get; set; }
+		
+		public class PlayerData
+		{
+			public int Direction { get; set; }
+			
+			public float PositionX { get; set; }
+			
+			public float PositionY { get; set; }
+		}
 	}
 }

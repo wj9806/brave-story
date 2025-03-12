@@ -1,4 +1,7 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text.Json;
 using Godot;
 
 namespace bravestory.scripts;
@@ -56,5 +59,23 @@ public partial class Stats : Node
 	{
 		//回复能量
 		Energy += EnergyRegen * delta;
+	}
+	
+	public Dictionary<string, object> ToDict()
+	{
+		return new Dictionary<string, object>
+		{
+			["max_energy"] = MaxEnergy,
+			["max_health"] = MaxHealth,
+			["health"] = Health
+		};
+	}
+
+	public void FromDict(Dictionary<string, object> dict)
+	{
+		//这里代码有点沙雕
+		MaxEnergy = ((JsonElement)dict["max_energy"]).GetInt16();
+		MaxHealth = ((JsonElement)dict["max_health"]).GetInt16();
+		Health = ((JsonElement)dict["health"]).GetInt16();
 	}
 }

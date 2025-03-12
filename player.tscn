@@ -2228,6 +2228,7 @@ disabled = true
 one_shot = true
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 128
 
 [node name="StatusPanel" parent="CanvasLayer" instance=ExtResource("8_dw050")]
 offset_left = 3.0

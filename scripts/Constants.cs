@@ -39,4 +39,6 @@ public abstract class Constants
 
     //滑铲所需能量
     public const double SlidingEnergy = 4.0d;
+
+    public const string SavePath = "user://data.sav";
 }

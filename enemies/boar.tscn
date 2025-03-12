@@ -478,7 +478,7 @@ position = Vector2(-10, -17)
 target_position = Vector2(-13, 0)
 
 [node name="FloorChecker" type="RayCast2D" parent="Graphics" index="2"]
-position = Vector2(-11, -2)
+position = Vector2(-19, -2)
 target_position = Vector2(0, 6)
 
 [node name="PlayerChecker" type="RayCast2D" parent="Graphics" index="3"]

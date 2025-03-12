@@ -62,6 +62,8 @@ public partial class Enemy : CharacterBody2D
 
         StateMachine = new();
         AddChild(StateMachine);
+        
+        AddToGroup("enemies");
     }
 
     protected void Move(float speed, double delta)

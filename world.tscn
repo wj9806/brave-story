@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=4 uid="uid://cil41iuky5nbk"]
+[gd_scene load_steps=17 format=4 uid="uid://cil41iuky5nbk"]
 
 [ext_resource type="Texture2D" uid="uid://gf1obiel2q1w" path="res://assets/Tree-Assets.png" id="1_f3sb7"]
 [ext_resource type="Script" uid="uid://b4w817kk54ua1" path="res://scripts/World.cs" id="1_tlwt5"]
@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://bnu8yqqc404ks" path="res://assets/Legacy-Fantasy - High Forest 2.3/Trees/Golden-Tree.png" id="6_dwbse"]
 [ext_resource type="Script" uid="uid://dmypb3efetleu" path="res://scripts/Camera2d.cs" id="6_wse8f"]
 [ext_resource type="PackedScene" uid="uid://r3yu4lqbp00b" path="res://enemies/boar.tscn" id="7_pkg7o"]
+[ext_resource type="PackedScene" uid="uid://butjhh3bb0lgd" path="res://save_stone.tscn" id="11_ic0uy"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ioo17"]
 texture = ExtResource("1_f3sb7")
@@ -798,3 +799,10 @@ region_rect = Rect2(210, 293, 124, 86)
 [node name="Boar" parent="." instance=ExtResource("7_pkg7o")]
 z_index = 150
 position = Vector2(80, 200)
+
+[node name="Boar2" parent="." instance=ExtResource("7_pkg7o")]
+z_index = 150
+position = Vector2(152, 64)
+
+[node name="SaveStone" parent="." instance=ExtResource("11_ic0uy")]
+position = Vector2(200, 120)
