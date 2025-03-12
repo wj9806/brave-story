@@ -51,9 +51,10 @@ public partial class Player : CharacterBody2D
     private static readonly List<State> GroundStates = [];
 
     private bool _canCombo;
-    private float _fallFromY; //角色从多高掉落
 
     private Direction _direction = Direction.Left;
+
+    public float FallFromY { get; set; }
 
     [Export]
     public Direction Direction
@@ -295,12 +296,12 @@ public partial class Player : CharacterBody2D
             case State.Fall:
                 if (IsOnFloor())
                 {
-                    var height = GlobalPosition.Y - _fallFromY;
+                    var height = GlobalPosition.Y - FallFromY;
                     if (isStill)
                         if (height >= LandingHeight)
                             return State.Landing;
                         else
-                           return State.Idle;
+                            return State.Idle;
                     return State.Running;
                 }
                 if (CanWallSlide())
@@ -411,7 +412,7 @@ public partial class Player : CharacterBody2D
                 {
                     _coyoteTimer.Start();
                 }
-                _fallFromY = GlobalPosition.Y;
+                FallFromY = GlobalPosition.Y;
                 break;
             case State.Running:
                 _animationPlayer.Play("running");
@@ -449,6 +450,10 @@ public partial class Player : CharacterBody2D
                 break;
             case State.Hurt:
                 _animationPlayer.Play("hurt");
+                
+                var game = GetTree().GetRoot().GetNode<Game>("/root/Game");
+                game.ShakeCamera(4);
+                
                 //扣血
                 _stats.Health -= _pendingDamage.Amount;
                 //计算相对方向

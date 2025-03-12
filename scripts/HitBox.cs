@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Threading.Tasks;
 
 namespace bravestory.scripts;
 
@@ -29,5 +30,21 @@ public partial class HitBox : Area2D
 		EmitSignal(SignalName.Hit, hurtBox);
 		//触发hurtBox的hurt信号，入参是hitBox
 		hurtBox.EmitSignal(HurtBox.SignalName.Hurt, this);
+	}
+
+	public async void OnHitBoxHit(HurtBox hurtBox)
+	{
+		var game = GetTree().GetRoot().GetNode<Game>("/root/Game");
+		game.ShakeCamera(2);
+		
+		Engine.TimeScale = 0.01;
+		await WaitTime();
+		Engine.TimeScale = 1f;
+	}
+
+	private async Task WaitTime()
+	{
+		await ToSignal(GetTree().CreateTimer(0.1f, true, false, true), 
+			SceneTreeTimer.SignalName.Timeout);
 	}
 }

@@ -308,7 +308,7 @@ tile_map_data = PackedByteArray("AAAaAA8AAAACAAQAAAAaAA4AAAABAAIAAAAaAA0AAAACAAA
 tile_set = SubResource("TileSet_dnhvd")
 
 [node name="MineGate" parent="TileMapLayer" instance=ExtResource("1_yhhov")]
-position = Vector2(70, 81)
+position = Vector2(65, 79)
 scale = Vector2(-1, 1)
 Path = "uid://cil41iuky5nbk"
 EntryPoint = "BottomEntry"
@@ -319,7 +319,7 @@ EntryPoint = "BottomEntry"
 shape = SubResource("SegmentShape2D_78gyg")
 
 [node name="CaveEntry" type="Marker2D" parent="TileMapLayer"]
-position = Vector2(19, 205)
+position = Vector2(21, 207)
 script = ExtResource("3_23xot")
 metadata/_custom_type_script = "uid://kc2n7d3bc87y"
 

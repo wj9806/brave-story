@@ -29,6 +29,7 @@ public partial class World : Node2D
     public void UpdatePlayer(Vector2 vector2, Direction direction)
     {
         _player.GlobalPosition = vector2;
+        _player.FallFromY = vector2.Y;
         _player.Direction = direction;
         _camera2D.ResetSmoothing();
         _camera2D.ForceUpdateScroll();

@@ -2255,3 +2255,4 @@ autoplay = "default"
 frame_progress = 0.602915
 
 [connection signal="Hurt" from="Graphics/HurtBox" to="." method="OnHurtBoxHurt"]
+[connection signal="Hit" from="Graphics/HitBox" to="Graphics/HitBox" method="OnHitBoxHit"]

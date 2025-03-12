@@ -1,10 +1,15 @@
+using System.Threading.Tasks;
 using Godot;
 
 namespace bravestory.scripts;
 
-public partial class Game : Node
+public partial class Game : CanvasLayer
 {
+	[Signal]
+	public delegate void CameraShouldShakeEventHandler(int amount);
+	
 	private Stats _playerStats;
+	private ColorRect _colorRect;
 
 	public Stats PlayerStats
 	{
@@ -16,6 +21,9 @@ public partial class Game : Node
 
 	public override void _Ready()
 	{
+		_colorRect = GetNode<ColorRect>("ColorRect");
+		_colorRect.Color = new Color(_colorRect.Color, 0f);
+			
 		Viewport root = GetTree().Root;
 		// 根节点的最后一个子节点始终是加载的场景。
 		CurrentScene = root.GetChild(-1);
@@ -23,11 +31,31 @@ public partial class Game : Node
 		PlayerStats = GetNode<Stats>("PlayerStats");
 	}
 	
-	public void ChangeScene(string path, string entryPoint)
+	public async void ChangeScene(string path, string entryPoint)
 	{
+		var tree = GetTree();
+		tree.Paused = true;
+
+		Tween tween = CreateTween();
+		tween.SetPauseMode(Tween.TweenPauseMode.Process);
+		tween.TweenProperty(_colorRect, "color:a", 1, 0.2);
+		await WaitTween(tween);
+		
 		CallDeferred(MethodName.DeferredGotoScene, path, entryPoint);
-	}
+		
+		tree.Paused = false;
 	
+		tween = CreateTween();
+		tween.SetPauseMode(Tween.TweenPauseMode.Process);
+		tween.TweenProperty(_colorRect, "color:a", 0, 0.2);
+		await WaitTween(tween);
+	}
+
+	private async Task WaitTween(Tween tween)
+	{
+		await ToSignal(tween, Tween.SignalName.Finished);
+	}
+
 	public void DeferredGotoScene(string path, string entryPoint)
 	{
 		//销毁当前场景
@@ -59,5 +87,10 @@ public partial class Game : Node
 				break;
 			}
 		}
+	}
+
+	public void ShakeCamera(int amount)
+	{
+		EmitSignal(SignalName.CameraShouldShake, amount);
 	}
 }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=4 uid="uid://cil41iuky5nbk"]
+[gd_scene load_steps=16 format=4 uid="uid://cil41iuky5nbk"]
 
 [ext_resource type="Texture2D" uid="uid://gf1obiel2q1w" path="res://assets/Tree-Assets.png" id="1_f3sb7"]
 [ext_resource type="Script" uid="uid://b4w817kk54ua1" path="res://scripts/World.cs" id="1_tlwt5"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://kc2n7d3bc87y" path="res://scripts/EntryPoint.cs" id="4_ioo17"]
 [ext_resource type="Texture2D" uid="uid://i7ra7efwnu03" path="res://assets/Legacy-Fantasy - High Forest 2.3/Trees/Background.png" id="5_036b0"]
 [ext_resource type="Texture2D" uid="uid://bnu8yqqc404ks" path="res://assets/Legacy-Fantasy - High Forest 2.3/Trees/Golden-Tree.png" id="6_dwbse"]
+[ext_resource type="Script" uid="uid://dmypb3efetleu" path="res://scripts/Camera2d.cs" id="6_wse8f"]
 [ext_resource type="PackedScene" uid="uid://r3yu4lqbp00b" path="res://enemies/boar.tscn" id="7_pkg7o"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ioo17"]
@@ -621,7 +622,6 @@ metadata/_custom_type_script = "uid://kc2n7d3bc87y"
 [node name="BornEntry" type="Marker2D" parent="TileMapLayer"]
 position = Vector2(129, 150)
 script = ExtResource("4_ioo17")
-Direction = -1
 metadata/_custom_type_script = "uid://kc2n7d3bc87y"
 
 [node name="Player" parent="." instance=ExtResource("2_fj7yv")]
@@ -636,6 +636,8 @@ position_smoothing_speed = 10.0
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
 editor_draw_drag_margin = true
+script = ExtResource("6_wse8f")
+_strength = 0.0
 
 [node name="TileMapLayer2" type="TileMapLayer" parent="."]
 tile_map_data = PackedByteArray("AAAQAPr/AAAIAAUAAAAQAPv/AAAIAAUAAAAQAPz/AAAIAAUAAAAQAP3/AAAIAAUAAAAQAP7/AAAIAAUAAAAdAPv/AAAIAAUAAAAdAPz/AAAIAAUAAAAdAP3/AAAIAAUAAAAdAP7/AAAIAAUAAAASAAkAAAANAAcAAAASAAoAAAANAAgAAAASAAsAAAANAAkAAAASAAwAAAANAAoAAAATAAkAAAAOAAcAAAATAAoAAAAOAAgAAAATAAsAAAAOAAkAAAATAAwAAAAOAAoAAAAUAAgAAAAPAAYAAAAUAAkAAAAPAAcAAAAUAAoAAAAPAAgAAAAUAAsAAAAPAAkAAAAUAAwAAAAPAAoAAAAUAA0AAAAPAAsAAAAVAAgAAAAQAAYAAAAVAAkAAAAQAAcAAAAVAAoAAAAQAAgAAAAVAAsAAAAQAAkAAAAVAAwAAAAQAAoAAAAVAA0AAAAQAAsAAAAWAAgAAAARAAYAAAAWAAkAAAARAAcAAAAWAAoAAAARAAgAAAAWAAsAAAARAAkAAAAWAAwAAAARAAoAAAAWAA0AAAARAAsAAAAXAAgAAAASAAYAAAAXAAkAAAASAAcAAAAXAAoAAAASAAgAAAAXAAsAAAASAAkAAAAXAAwAAAASAAoAAAAXAA0AAAASAAsAAAAYAAkAAAATAAcAAAAYAAoAAAATAAgAAAAYAAsAAAATAAkAAAAYAAwAAAATAAoAAAAZAAkAAAAUAAcAAAAZAAoAAAAUAAgAAAAZAAsAAAAUAAkAAAAZAAwAAAAUAAoAAAD9/wEAAAANAA0AAAD9/wIAAAANAA4AAAD9/wMAAAANAA8AAAD9/wQAAAANABAAAAD+/wEAAAAOAA0AAAD+/wIAAAAOAA4AAAD+/wMAAAAOAA8AAAD+/wQAAAAOABAAAAD//wAAAAAPAAwAAAD//wEAAAAPAA0AAAD//wIAAAAPAA4AAAD//wMAAAAPAA8AAAD//wQAAAAPABAAAAD//wUAAAAPABEAAAAAAAAAAAAQAAwAAAAAAAEAAAAQAA0AAAAAAAIAAAAQAA4AAAAAAAMAAAAQAA8AAAAAAAQAAAAQABAAAAAAAAUAAAAQABEAAAABAAAAAAARAAwAAAABAAEAAAARAA0AAAABAAIAAAARAA4AAAABAAMAAAARAA8AAAABAAQAAAARABAAAAABAAUAAAARABEAAAACAAAAAAASAAwAAAACAAEAAAASAA0AAAACAAIAAAASAA4AAAACAAMAAAASAA8AAAACAAQAAAASABAAAAACAAUAAAASABEAAAADAAEAAAATAA0AAAADAAIAAAATAA4AAAADAAMAAAATAA8AAAADAAQAAAATABAAAAAEAAEAAAAUAA0AAAAEAAIAAAAUAA4AAAAEAAMAAAAUAA8AAAAEAAQAAAAUABAAAAAfAAkAAAAIAAUAAAAfAAoAAAAIAAUAAAAfAAsAAAAIAAUAAAAfAAwAAAAIAAUAAAA=")
@@ -740,7 +742,7 @@ region_enabled = true
 region_rect = Rect2(210, 5, 124, 86)
 
 [node name="Foreground2" type="ParallaxBackground" parent="Node2D"]
-layer = 128
+layer = 100
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="Node2D/Foreground2"]
 motion_scale = Vector2(1.1, 1)
@@ -795,4 +797,4 @@ region_rect = Rect2(210, 293, 124, 86)
 
 [node name="Boar" parent="." instance=ExtResource("7_pkg7o")]
 z_index = 150
-position = Vector2(79, 198)
+position = Vector2(80, 200)
