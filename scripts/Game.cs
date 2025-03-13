@@ -54,9 +54,14 @@ public partial class Game : CanvasLayer
 			PlayerStats.FromDict(gameData.Stats);
 			CallDeferred(MethodName.DeferredGotoScene, path, entryPoint, JsonSerializer.Serialize(gameData.Player));
 		}
-		else
+		else if (entryPoint != null)
 		{
 			CallDeferred(MethodName.DeferredGotoScene, path, entryPoint, "");
+		}
+		else
+		{
+			//回到标题
+			CallDeferred(MethodName.DeferredGotoScene, path, "", "");
 		}
 
 		tree.Paused = false;
@@ -76,7 +81,10 @@ public partial class Game : CanvasLayer
 	{
 		//保存当前场景数据
 		var baseName = CurrentScene.SceneFilePath.GetFile().GetBaseName();
-		_worldStates[baseName] = ((World)CurrentScene).ToDict();
+		if (baseName != "title_screen")
+		{
+			_worldStates[baseName] = ((World)CurrentScene).ToDict();
+		}
 		
 		//销毁当前场景
 		CurrentScene.Free();
@@ -149,7 +157,12 @@ public partial class Game : CanvasLayer
 		String json = JsonSerializer.Serialize(pd);
 		GD.Print("Saving game: " + json);
 		var file = FileAccess.Open(Constants.SavePath, FileAccess.ModeFlags.Write);
-		file.StoreString(json);
+		if (file != null)
+		{
+			file.StoreString(json);
+			file.Flush();
+			file.Close();
+		}
 	}
 
 	//读取存档代码写的有点沙雕,等待重构
@@ -164,12 +177,28 @@ public partial class Game : CanvasLayer
 		ChangeScene(gameData.Scene, null, txt);
 	}
 
+	public void NewGame()
+	{
+		ChangeScene("res://world.tscn", "BornEntry", null);
+	}
+
 	public override void _UnhandledInput(InputEvent @event)
 	{
 		if (@event.IsActionPressed("ui_cancel"))
 		{
-			LoadGame();
+			BackToTitle();
 		}
+	}
+
+	//是否有存档
+	public bool HasSaveFile()
+	{
+		return FileAccess.FileExists(Constants.SavePath);
+	}
+
+	private void BackToTitle()
+	{
+		ChangeScene("res://title_screen.tscn", null, null);
 	}
 
 	//游戏序列化数据

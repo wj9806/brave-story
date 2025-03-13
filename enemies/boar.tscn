@@ -470,7 +470,6 @@ script = ExtResource("2_iippf")
 
 [node name="Sprite2D" parent="Graphics" index="0"]
 position = Vector2(0, -16)
-texture = ExtResource("2_gvyro")
 hframes = 6
 
 [node name="WallChecker" type="RayCast2D" parent="Graphics" index="1"]

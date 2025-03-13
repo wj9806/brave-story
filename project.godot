@@ -15,7 +15,7 @@ warnings/check_invalid_track_paths=false
 [application]
 
 config/name="brave story"
-run/main_scene="uid://cil41iuky5nbk"
+run/main_scene="uid://bsi2j2yt2ors7"
 config/features=PackedStringArray("4.4", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -36,10 +36,6 @@ window/stretch/mode="canvas_items"
 [dotnet]
 
 project/assembly_name="brave story"
-
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/com.timothyqiu.animation-resetter/plugin.cfg")
 
 [input]
 

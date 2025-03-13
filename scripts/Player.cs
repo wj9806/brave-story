@@ -131,7 +131,7 @@ public partial class Player : CharacterBody2D
         if (@event.IsActionPressed("attack") && _canCombo)
         {
             _isComboRequested = true;
-        }
+        } 
 
         //滑铲按键预输入
         if (@event.IsActionPressed("slide"))

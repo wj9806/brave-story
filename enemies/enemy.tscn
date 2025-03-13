@@ -28,6 +28,7 @@ metadata/_custom_type_script = "uid://bcovgkvp4kadn"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+deterministic = true
 
 [node name="Stats" type="Node" parent="."]
 script = ExtResource("4_a6vjd")
