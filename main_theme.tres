@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=5 format=3 uid="uid://2aqgrsylx3qb"]
+[gd_resource type="Theme" load_steps=11 format=3 uid="uid://2aqgrsylx3qb"]
 
 [ext_resource type="FontFile" uid="uid://csth5bngjlxuw" path="res://assets/SmileySans-Oblique.otf" id="1_470mv"]
 [ext_resource type="Texture2D" uid="uid://drrghcbea0yrw" path="res://assets/Legacy-Fantasy - High Forest 2.3/HUD/Base-01.png" id="1_a2l2q"]
@@ -17,6 +17,41 @@ texture_margin_right = 3.0
 texture_margin_bottom = 3.0
 region_rect = Rect2(94, 14, 20, 20)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_a2l2q"]
+atlas = ExtResource("1_a2l2q")
+region = Rect2(3, 130, 11, 11)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0omi4"]
+atlas = ExtResource("1_a2l2q")
+region = Rect2(3, 114, 11, 11)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_58jnp"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_466ly"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_a2l2q"]
+texture = ExtResource("1_a2l2q")
+texture_margin_left = 1.0
+texture_margin_top = 2.0
+texture_margin_right = 1.0
+texture_margin_bottom = 2.0
+expand_margin_bottom = 1.0
+region_rect = Rect2(95, 207, 18, 18)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_58jnp"]
+content_margin_left = 16.0
+content_margin_top = 4.0
+content_margin_right = 16.0
+content_margin_bottom = 4.0
+texture = ExtResource("1_a2l2q")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 2
+region_rect = Rect2(64, 272, 16, 16)
+
 [resource]
 default_font = ExtResource("1_470mv")
 Button/colors/font_outline_color = Color(0, 0, 0, 1)
@@ -27,3 +62,11 @@ Button/styles/focus = SubResource("StyleBoxTexture_0omi4")
 Button/styles/hover = SubResource("StyleBoxEmpty_a2l2q")
 Button/styles/normal = SubResource("StyleBoxEmpty_a2l2q")
 Button/styles/pressed = SubResource("StyleBoxEmpty_a2l2q")
+HSlider/icons/grabber = SubResource("AtlasTexture_a2l2q")
+HSlider/icons/grabber_highlight = SubResource("AtlasTexture_0omi4")
+HSlider/styles/grabber_area = SubResource("StyleBoxEmpty_58jnp")
+HSlider/styles/grabber_area_highlight = SubResource("StyleBoxEmpty_466ly")
+HSlider/styles/slider = SubResource("StyleBoxTexture_a2l2q")
+Label/colors/font_shadow_color = Color(0, 0, 0, 0.501961)
+Label/styles/normal = null
+PanelContainer/styles/panel = SubResource("StyleBoxTexture_58jnp")

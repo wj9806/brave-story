@@ -12,9 +12,11 @@ public partial class Game : CanvasLayer
 	[Signal]
 	public delegate void CameraShouldShakeEventHandler(int amount);
 	
+	public static Game Instance { get; private set; }
+	
 	private Stats _playerStats;
 	private ColorRect _colorRect;
-
+	private SoundManager _soundManager;
 	private Dictionary<string, Hashtable> _worldStates = new();
 
 	public Stats PlayerStats
@@ -27,6 +29,7 @@ public partial class Game : CanvasLayer
 
 	public override void _Ready()
 	{
+		Instance = this;
 		_colorRect = GetNode<ColorRect>("ColorRect");
 		_colorRect.Color = new Color(_colorRect.Color, 0f);
 			
@@ -35,6 +38,9 @@ public partial class Game : CanvasLayer
 		CurrentScene = root.GetChild(-1);
 
 		PlayerStats = GetNode<Stats>("PlayerStats");
+		
+		_soundManager = GetTree().GetRoot().GetNode<SoundManager>("SoundManager");
+		LoadConfig();
 	}
 	
 	public async void ChangeScene(string path, string entryPoint, string gameDataJson)
@@ -83,7 +89,6 @@ public partial class Game : CanvasLayer
 		var baseName = CurrentScene.SceneFilePath.GetFile().GetBaseName();
 		if (!baseName.Contains("title_screen") && !path.Contains("title_screen") && CurrentScene is World world)
 		{
-			GD.Print("_worldStates");
 			_worldStates[baseName] = world.ToDict();
 		}
 		
@@ -184,13 +189,13 @@ public partial class Game : CanvasLayer
 		ChangeScene("res://world.tscn", "BornEntry", null);
 	}
 
-	public override void _UnhandledInput(InputEvent @event)
+	/*public override void _UnhandledInput(InputEvent @event)
 	{
 		if (@event.IsActionPressed("ui_cancel"))
 		{
 			BackToTitle();
 		}
-	}
+	}*/
 
 	//是否有存档
 	public bool HasSaveFile()
@@ -222,5 +227,25 @@ public partial class Game : CanvasLayer
 			
 			public float PositionY { get; set; }
 		}
+	}
+
+	public void SaveConfig()
+	{
+		var config = new ConfigFile();
+		config.SetValue("audio", "master", _soundManager.GetVolume((int)Bus.Master));
+		config.SetValue("audio", "sfx", _soundManager.GetVolume((int)Bus.Sfx));
+		config.SetValue("audio", "bgm", _soundManager.GetVolume((int)Bus.Bgm));
+
+		config.Save(Constants.ConfigPath);
+	}
+
+	public void LoadConfig()
+	{
+		var config = new ConfigFile();
+		config.Load(Constants.ConfigPath);
+		
+		_soundManager.SetVolume((int)Bus.Master, config.GetValue("audio", "master", 0.5).AsSingle());
+		_soundManager.SetVolume((int)Bus.Sfx, config.GetValue("audio", "sfx", 0.5).AsSingle());
+		_soundManager.SetVolume((int)Bus.Bgm, config.GetValue("audio", "bgm", 0.5).AsSingle());
 	}
 }

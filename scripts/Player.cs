@@ -43,6 +43,7 @@ public partial class Player : CharacterBody2D
     private AnimatedSprite2D _interactionIcon;
     private GameOverScreen _gameOverScreen;
     private SoundManager _soundManager;
+    private PauseScreen _pauseScreen;
 
     //与玩家的交互物体
     private readonly List<Interactable> _interactableWithList = [];
@@ -102,6 +103,7 @@ public partial class Player : CharacterBody2D
         _invincibleTimer = GetNode<Timer>("InvincibleTimer");
         _interactionIcon = GetNode<AnimatedSprite2D>("InteractionIcon");
         _gameOverScreen = GetNode<GameOverScreen>("CanvasLayer/GameOverScreen");
+        _pauseScreen = GetNode<PauseScreen>("CanvasLayer/PauseScreen");
         _soundManager = GetTree().GetRoot().GetNode<SoundManager>("SoundManager");
 
         _stateMachine = new StateMachine();
@@ -146,6 +148,11 @@ public partial class Player : CharacterBody2D
         if (@event.IsActionPressed("interact") && _interactableWithList.Count > 0)
         {
             _interactableWithList.Last().InteractHandler();
+        }
+
+        if (@event.IsActionPressed("pause"))
+        {
+            _pauseScreen.ShowPause();
         }
     }
 

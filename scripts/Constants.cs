@@ -41,4 +41,5 @@ public abstract class Constants
     public const double SlidingEnergy = 4.0d;
 
     public const string SavePath = "user://data.sav";
+    public const string ConfigPath = "user://config.ini";
 }
