@@ -15,7 +15,6 @@ public partial class Camera2d : Camera2D
 	public override void _Ready()
 	{
 		var game = GetTree().GetRoot().GetNode<Game>("/root/Game");
-
 		game.Connect(Game.SignalName.CameraShouldShake, new Callable(this, "UpdateStrength"));
 	}
 

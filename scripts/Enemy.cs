@@ -12,6 +12,9 @@ public partial class Enemy : CharacterBody2D
     protected StateMachine StateMachine;
     protected Stats Stats;
 
+    [Signal]
+    protected delegate void DiedEventHandler();
+
     private Direction _direction = Direction.Left;
 
     [Export]
@@ -75,6 +78,7 @@ public partial class Enemy : CharacterBody2D
 
     private void Die()
     {
+        EmitSignalDied();
         QueueFree();
     }
 }

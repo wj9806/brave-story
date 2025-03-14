@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://p04bq171ensw"
+path="res://.godot/imported/1 titles LOOP.ogg-e703dbe66ca0b35ec6dc7cc5dbb28d31.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/music/1 titles LOOP.ogg"
+dest_files=["res://.godot/imported/1 titles LOOP.ogg-e703dbe66ca0b35ec6dc7cc5dbb28d31.oggvorbisstr"]
+
+[params]
+
+loop=true
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

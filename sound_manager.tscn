@@ -1,0 +1,35 @@
+[gd_scene load_steps=6 format=3 uid="uid://2dxkxw3iwp5r"]
+
+[ext_resource type="Script" uid="uid://cp8r5gyedotnf" path="res://scripts/SoundManager.cs" id="1_22ksp"]
+[ext_resource type="AudioStream" uid="uid://ca4k1xdsg7vum" path="res://assets/music/07_human_atk_sword_1.wav" id="1_mdjn0"]
+[ext_resource type="AudioStream" uid="uid://cd266vygh0neg" path="res://assets/music/12_human_jump_1.wav" id="2_22ksp"]
+[ext_resource type="AudioStream" uid="uid://b4dsabghb0lu0" path="res://assets/music/impactMetal_heavy_002.ogg" id="4_h8btt"]
+[ext_resource type="AudioStream" uid="uid://baf1pdrlp0mp3" path="res://assets/music/impactGlass_medium_004.ogg" id="5_7jwsb"]
+
+[node name="SoundManager" type="Node"]
+script = ExtResource("1_22ksp")
+
+[node name="SFX" type="Node" parent="."]
+
+[node name="Attack" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource("1_mdjn0")
+volume_db = 1.0
+bus = &"SFX"
+
+[node name="Jump" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource("2_22ksp")
+volume_db = 1.0
+bus = &"SFX"
+
+[node name="UIPress" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource("5_7jwsb")
+volume_db = 1.0
+bus = &"SFX"
+
+[node name="UIFocus" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource("4_h8btt")
+volume_db = 1.0
+bus = &"SFX"
+
+[node name="BGMPlayer" type="AudioStreamPlayer" parent="."]
+bus = &"BGM"

@@ -79,11 +79,12 @@ public partial class Game : CanvasLayer
 
 	public void DeferredGotoScene(string path, string entryPoint, string playerJson)
 	{
-		//保存当前场景数据
+		//保存当前场景数据 
 		var baseName = CurrentScene.SceneFilePath.GetFile().GetBaseName();
-		if (baseName != "title_screen")
+		if (!baseName.Contains("title_screen") && !path.Contains("title_screen") && CurrentScene is World world)
 		{
-			_worldStates[baseName] = ((World)CurrentScene).ToDict();
+			GD.Print("_worldStates");
+			_worldStates[baseName] = world.ToDict();
 		}
 		
 		//销毁当前场景
@@ -179,6 +180,7 @@ public partial class Game : CanvasLayer
 
 	public void NewGame()
 	{
+		PlayerStats.Health = PlayerStats.MaxHealth;
 		ChangeScene("res://world.tscn", "BornEntry", null);
 	}
 
@@ -196,7 +198,7 @@ public partial class Game : CanvasLayer
 		return FileAccess.FileExists(Constants.SavePath);
 	}
 
-	private void BackToTitle()
+	public void BackToTitle()
 	{
 		ChangeScene("res://title_screen.tscn", null, null);
 	}

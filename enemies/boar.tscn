@@ -473,7 +473,7 @@ position = Vector2(0, -16)
 hframes = 6
 
 [node name="WallChecker" type="RayCast2D" parent="Graphics" index="1"]
-position = Vector2(-10, -17)
+position = Vector2(-10, -11)
 target_position = Vector2(-13, 0)
 
 [node name="FloorChecker" type="RayCast2D" parent="Graphics" index="2"]

@@ -23,6 +23,7 @@ config/icon="res://icon.svg"
 
 Game="*res://game.tscn"
 Vignette="res://vignette.tscn"
+SoundManager="*res://sound_manager.tscn"
 
 [display]
 

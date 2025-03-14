@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://hi6rq7mbplnb"
+path="res://.godot/imported/14 BOSS y LOOP.ogg-9eec50345d090d2d614025457113b80b.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/music/14 BOSS y LOOP.ogg"
+dest_files=["res://.godot/imported/14 BOSS y LOOP.ogg-9eec50345d090d2d614025457113b80b.oggvorbisstr"]
+
+[params]
+
+loop=true
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

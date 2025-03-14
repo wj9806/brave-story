@@ -41,6 +41,8 @@ public partial class Player : CharacterBody2D
     private Stats _stats;
     private Timer _invincibleTimer; //受击后的无敌计时器
     private AnimatedSprite2D _interactionIcon;
+    private GameOverScreen _gameOverScreen;
+    private SoundManager _soundManager;
 
     //与玩家的交互物体
     private readonly List<Interactable> _interactableWithList = [];
@@ -99,10 +101,12 @@ public partial class Player : CharacterBody2D
         _stats = GetParent().GetNode<Game>("/root/Game").PlayerStats;
         _invincibleTimer = GetNode<Timer>("InvincibleTimer");
         _interactionIcon = GetNode<AnimatedSprite2D>("InteractionIcon");
+        _gameOverScreen = GetNode<GameOverScreen>("CanvasLayer/GameOverScreen");
+        _soundManager = GetTree().GetRoot().GetNode<SoundManager>("SoundManager");
 
         _stateMachine = new StateMachine();
         AddChild(_stateMachine);
-
+        
         _hurtBox = _graphics.GetNode<HurtBox>("HurtBox");
 
         State[] states = [State.Idle, State.Running, State.Landing, State.Attack1, State.Attack2, State.Attack3];
@@ -429,6 +433,7 @@ public partial class Player : CharacterBody2D
                 Velocity = new Vector2(Velocity.X, JumpVelocity);
                 _coyoteTimer.Stop();
                 _jumpRequestTimer.Stop();
+                _soundManager.PlaySfx("Jump");
                 break;
             case State.Landing:
                 _animationPlayer.Play("landing");
@@ -439,14 +444,17 @@ public partial class Player : CharacterBody2D
             case State.Attack1:
                 _animationPlayer.Play("attack_1");
                 _isComboRequested = false;
+                _soundManager.PlaySfx("Attack");
                 break;
             case State.Attack2:
                 _animationPlayer.Play("attack_2");
                 _isComboRequested = false;
+                _soundManager.PlaySfx("Attack");
                 break;
             case State.Attack3:
                 _animationPlayer.Play("attack_3");
                 _isComboRequested = false;
+                _soundManager.PlaySfx("Attack");
                 break;
             case State.Hurt:
                 _animationPlayer.Play("hurt");
@@ -520,9 +528,11 @@ public partial class Player : CharacterBody2D
         //GetTree().ReloadCurrentScene();
         
         //死亡后，在出生点复活
-        var game = GetParent().GetNode<Game>("/root/Game");
-        game.ChangeScene("res://world.tscn", "BornEntry", null);
-        _stats.Health = _stats.MaxHealth;
+        //var game = GetParent().GetNode<Game>("/root/Game");
+        //game.ChangeScene("res://world.tscn", "BornEntry", null);
+        //_stats.Health = _stats.MaxHealth;
+        
+        _gameOverScreen.ShowGameOverScreen();
     }
 
     public void AddInteractable(Interactable interactable)
